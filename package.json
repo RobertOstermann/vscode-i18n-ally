@@ -1,8 +1,8 @@
 {
-  "publisher": "lokalise",
-  "name": "i18n-ally",
-  "version": "2.13.1",
-  "displayName": "i18n Ally",
+  "publisher": "RobertOstermann",
+  "name": "i18n-ally-ostermann",
+  "version": "2.14.0",
+  "displayName": "i18n Ally Ostermann",
   "description": "🌍 All in one i18n extension for VS Code",
   "keywords": [
     "vue",
@@ -712,6 +712,11 @@
       "type": "object",
       "title": "%extname%",
       "properties": {
+        "i18n-ally.problems.disabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Disable i18n Ally from adding to the Problems view."
+        },
         "i18n-ally.disabled": {
           "type": "boolean",
           "default": false,

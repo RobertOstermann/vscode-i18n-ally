@@ -33,6 +33,8 @@ export class ProblemProvider {
     if (!document || !Global.isLanguageIdSupported(document.languageId))
       return
 
+    if (Config.problemsDisabled) return
+
     const locale = Config.displayLanguage
     const loader: Loader = CurrentFile.loader
 

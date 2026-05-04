@@ -50,6 +50,10 @@ export class Config {
     return workspace.rootPath!
   }
 
+  static get problemsDisabled() {
+    return Config.getConfig<boolean>('problems.disabled') ?? false
+  }
+
   static get disabled() {
     return Config.getConfig<boolean>('disabled') ?? false
   }
@@ -180,7 +184,7 @@ export class Config {
     return this.getConfig<SortCompare>('sortCompare') || 'binary'
   }
 
-  static get sortLocale(): string | undefined{
+  static get sortLocale(): string | undefined {
     return this.getConfig<string>('sortLocale')
   }
 
