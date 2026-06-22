@@ -55,11 +55,9 @@ export class KeyDetector {
     return keyRange?.key
   }
 
-  static getScopedKey(document: TextDocument, position: Position)
-  {
+  static getScopedKey(document: TextDocument, position: Position) {
     const scopes = Global.enabledFrameworks.flatMap(f => f.getScopeRange(document) || [])
-    if (scopes.length > 0)
-    {
+    if (scopes.length > 0) {
       const offset = document.offsetAt(position)
       return scopes.filter(s => s.start < offset && offset < s.end).map(s => s.namespace).join('.')
     }
@@ -96,7 +94,7 @@ export class KeyDetector {
 
   static getKeys(document: TextDocument | string, regs?: RegExp[], dotEnding?: boolean, scopes?: ScopeRange[]): KeyInDocument[] {
     let text = ''
-    let rewriteContext: RewriteKeyContext| undefined
+    let rewriteContext: RewriteKeyContext | undefined
     let filepath = ''
     if (typeof document !== 'string') {
       filepath = document.uri.fsPath
@@ -115,10 +113,91 @@ export class KeyDetector {
       text = document
     }
 
-    const keys = regexFindKeys(text, regs, dotEnding, rewriteContext, scopes)
+    // Detect any withPrefix variable names and add them as additional regexes
+    // so regexFindKeys can pick up calls like prefix("text")
+    const withPrefixRegs = KeyDetector.getWithPrefixRegexes(text)
+    const allRegs = withPrefixRegs.length ? [...regs, ...withPrefixRegs] : regs
+
+    const keys = regexFindKeys(text, allRegs, dotEnding, rewriteContext, scopes)
+    const resolvedKeys = KeyDetector.resolveWithPrefixKeys(text, keys)
+
     if (filepath)
-      this._get_keys_cache[filepath] = keys
-    return keys
+      this._get_keys_cache[filepath] = resolvedKeys
+    return resolvedKeys
+  }
+
+  /**
+   * Scans the text for `withPrefix(...)` declarations and returns a regex
+   * for each variable name that can be used by regexFindKeys to detect calls.
+   *
+   * e.g. `const prefix = withPrefix("pages.home")`
+   * returns: [ /\bprefix\s*\(\s*['"]({key})['"]\s*\)/gm ]
+   */
+  static getWithPrefixRegexes(text: string): RegExp[] {
+    const declarationReg = /\b(const|let|var)\s+([\w$]+)\s*=\s*withPrefix\s*\(\s*['"]\s*([^'"]+?)\s*['"]\s*,?\s*\)/gms
+    const regs: RegExp[] = []
+
+    let match: RegExpExecArray | null
+    declarationReg.lastIndex = 0
+    // eslint-disable-next-line no-cond-assign
+    while (match = declarationReg.exec(text)) {
+      const varName = match[2]
+      regs.push(new RegExp(`\\b${varName}\\s*\\(\\s*[\`'"]([^'\`"]+)[\`'"]\\s*,?\\s*\\)`, 'gms'))
+    }
+
+    return regs
+  }
+
+  static resolveWithPrefixKeys(text: string, keys: KeyInDocument[]): KeyInDocument[] {
+    const declarationReg = /\b(const|let|var)\s+([\w$]+)\s*=\s*withPrefix\s*\(\s*['"]\s*([^'"]+?)\s*['"]\s*,?\s*\)/gms
+    const prefixMap: Record<string, string> = {}
+
+    let declMatch: RegExpExecArray | null
+    declarationReg.lastIndex = 0
+    // eslint-disable-next-line no-cond-assign
+    while (declMatch = declarationReg.exec(text)) {
+      const varName = declMatch[2]
+      const prefixValue = declMatch[3].trim()
+      prefixMap[varName] = prefixValue
+    }
+
+    if (Object.keys(prefixMap).length === 0)
+      return keys
+
+    const result = [...keys]
+
+    for (const [varName, prefix] of Object.entries(prefixMap)) {
+      const callReg = new RegExp(`\\b${varName}\\s*\\(\\s*(['\`"])([^'\`"]+)\\1\\s*,?\\s*\\)`, 'gms')
+      callReg.lastIndex = 0
+
+      let callMatch: RegExpExecArray | null
+      // eslint-disable-next-line no-cond-assign
+      while (callMatch = callReg.exec(text)) {
+        const suffix = callMatch[2]
+
+        const matchString = callMatch[0]
+        const suffixStart = callMatch.index + matchString.lastIndexOf(suffix)
+        const suffixEnd = suffixStart + suffix.length
+
+        const existing = result.find(k => k.start === suffixStart && k.end === suffixEnd)
+        if (!existing)
+          continue
+
+        const existingKey = existing.key
+        let namespacePrefix: string | undefined
+
+        if (existingKey !== suffix && existingKey.endsWith(`.${suffix}`))
+          namespacePrefix = existingKey.slice(0, existingKey.length - suffix.length - 1)
+        else
+          namespacePrefix = Config.defaultNamespace
+
+        existing.key = namespacePrefix
+          ? `${namespacePrefix}.${prefix}.${suffix}`
+          : `${prefix}.${suffix}`
+      }
+    }
+
+    return result
   }
 
   static getUsages(document: TextDocument, loader?: Loader): KeyUsages | undefined {

@@ -3,7 +3,32 @@
 </p>
 
 > **⚠️ This is a fork of [lokalise/i18n-ally](https://github.com/lokalise/i18n-ally).**
-> It extends the original extension with additional controls over which problems are displayed in the editor, giving you finer-grained configuration to suppress or highlight specific i18n diagnostics based on your project's needs.
+
+- Extends the original extension with additional controls over which problems are displayed in the editor, giving you finer-grained configuration to suppress or highlight specific i18n diagnostics based on your project's needs.
+- Adds support for the `withPrefix` pattern, which allows you to define a translation key prefix once and reuse it with suffix keys. The extension will automatically resolve the full key for annotations, hover, and diagnostics.
+
+```ts
+/**
+ * Creates a helper that combines a translation key prefix with a suffix key,
+ * returning a fully typed literal string.
+ *
+ * Autocomplete for `key` is limited to the valid suffixes for the provided
+ * `prefix`.
+ *
+ * @example
+ *   const prefix = withPrefix(
+ *     "pages.travel.steps.preferences.sections.car_service",
+ *   );
+ *   const key = prefix("banner"); // "pages.travel.steps.preferences.sections.car_service.banner"
+ */
+export const withPrefix =
+  <TPrefix extends TranslationKeyPrefix>(prefix: TPrefix) =>
+  <TKey extends TranslationKeySuffix<TPrefix>>(
+    key: TKey,
+  ): `${TPrefix}.${TKey}` => {
+    return `${prefix}.${key}` as `${TPrefix}.${TKey}`;
+  };
+```
 
 <p align="center">
 <a href="https://marketplace.visualstudio.com/items?itemName=RobertOstermann.i18n-ally-ostermann" target="__blank"><img src="https://img.shields.io/visual-studio-marketplace/v/RobertOstermann.i18n-ally-ostermann?color=blue&amp;label=VS%20Code%20Marketplace&logo=visual-studio-code" alt="Visual Studio Marketplace Version" /></a>

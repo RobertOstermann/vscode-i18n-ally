@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.14.1]
+
+- Adds `withPrefix` suppport.
+
+## [2.14.0]
+
+- It extends the original extension with additional controls over which problems are displayed in the editor, giving you finer-grained configuration to suppress or highlight specific i18n diagnostics based on your project's needs.
+
+
 ### [2.13.1](https://github.com/lokalise/i18n-ally/compare/v2.13.0...v2.13.1) (2024-11-01)
 
 ## [2.13.0](https://github.com/lokalise/i18n-ally/compare/v2.12.0...v2.13.0) (2024-11-01)
