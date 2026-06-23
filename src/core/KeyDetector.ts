@@ -200,7 +200,7 @@ export class KeyDetector {
     return result
   }
 
-  static getUsages(document: TextDocument, loader?: Loader): KeyUsages | undefined {
+  static getUsages(document: TextDocument, loader?: Loader, localeFix?: boolean): KeyUsages | undefined {
     if (loader == null)
       loader = CurrentFile.loader
 
@@ -223,7 +223,13 @@ export class KeyDetector {
 
       locale = localeFile.locale
       keys = parser.annotationGetKeys(document)
-        .filter(({ key }) => loader!.getTreeNodeByKey(key)?.type === 'node')
+      keys = keys.filter(({ key }) => {
+        if (!localeFix) return loader!.getTreeNodeByKey(key)?.type === 'node'
+
+        const namespacedKey = namespace ? `${namespace}.${key}` : key
+        const node = loader!.getTreeNodeByKey(namespacedKey)
+        return node?.type !== 'tree'
+      })
     }
     // code
     else if (Global.isLanguageIdSupported(document.languageId)) {

@@ -1,6 +1,7 @@
 import SortedStringify from 'json-stable-stringify'
 // @ts-ignore
 import JsonMap from 'json-source-map'
+import { KeyInDocument } from '../core'
 import { Parser } from './base'
 
 export class JsonParser extends Parser {
@@ -34,18 +35,23 @@ export class JsonParser extends Parser {
 
     const map = JsonMap.parse(text).pointers
     const pairs = Object.entries<any>(map)
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       .filter(([k, v]) => k)
-      .map(([k, v]) => ({
-        quoted: true,
-        start: v.value.pos + 1,
-        end: v.valueEnd.pos - 1,
-        // https://tools.ietf.org/html/rfc6901
-        key: k.slice(1)
-          .replace(/\//g, '.')
-          .replace(/~0/g, '~')
-          .replace(/~1/g, '/'),
-      }))
+      .map(([k, v]): KeyInDocument => {
+        return ({
+          quoted: true,
+          line: v.key.line,
+          start: v.value.pos + 1,
+          end: v.valueEnd.pos - 1,
+          // https://tools.ietf.org/html/rfc6901
+          key: k.slice(1)
+            .replace(/\//g, '.')
+            .replace(/~0/g, '~')
+            .replace(/~1/g, '/'),
+        })
+      })
 
+    // console.log('TEST JsonParser.parseAST pairs', pairs.map(p => ({ key: p.key, start: p.start, end: p.end })))
     return pairs
   }
 }
