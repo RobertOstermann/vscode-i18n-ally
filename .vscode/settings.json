@@ -1,5 +1,17 @@
 // Place your settings in this file to overwrite default and user settings.
 {
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true,
+    "**/flutter/ephemeral": true,
+    "**/Flutter/ephemeral": true,
+    "**/.symlinks": true,
+    "**/.plugin_symlinks": true,
+    "**/package.nls.*": true,
+  },
   "search.exclude": {
     "out": true,
     "dist": true,
@@ -7,7 +19,11 @@
     "CHANGELOG.md": true,
     "examples": true,
     "res": true,
-    "screenshots": true
+    "screenshots": true,
+    "**/.cache": true,
+    // Only allow searching the English translations
+    "**/locales/[a-df-z]*": true,
+    "**/locales/e[a-m,o-z]*": true
   },
   "[json]": {
     "editor.defaultFormatter": "vscode.json-language-features"
@@ -62,5 +78,5 @@
     "vue",
     "html"
   ],
-  "typescript.tsdk": "node_modules/typescript/lib",
+  "js/ts.tsdk.path": "node_modules/typescript/lib",
 }

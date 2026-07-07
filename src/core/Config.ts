@@ -591,4 +591,8 @@ export class Config {
   static get telemetry(): boolean {
     return workspace.getConfiguration().get('telemetry.enableTelemetry') as boolean
   }
+
+  static get ignoreMissingKeys(): boolean {
+    return this.getConfig<boolean>('ignoreMissingKeys') ?? false
+  }
 }

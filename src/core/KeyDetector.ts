@@ -5,7 +5,7 @@ import { Config } from './Config'
 import { Loader } from './loaders/Loader'
 import { ScopeRange } from '~/frameworks'
 import { regexFindKeys } from '~/utils'
-import { KeyInDocument, CurrentFile } from '~/core'
+import { KeyInDocument, CurrentFile, Analyst } from '~/core'
 
 export interface KeyUsages {
   type: 'code'| 'locale'
@@ -92,6 +92,7 @@ export class KeyDetector {
 
   private static _get_keys_cache: Record<string, KeyInDocument[]> = {}
 
+  // HERE: getKeys
   static getKeys(document: TextDocument | string, regs?: RegExp[], dotEnding?: boolean, scopes?: ScopeRange[]): KeyInDocument[] {
     let text = ''
     let rewriteContext: RewriteKeyContext | undefined
@@ -121,9 +122,18 @@ export class KeyDetector {
     const keys = regexFindKeys(text, allRegs, dotEnding, rewriteContext, scopes)
     const resolvedKeys = KeyDetector.resolveWithPrefixKeys(text, keys)
 
+    if (!Config.ignoreMissingKeys) {
+      if (filepath)
+        this._get_keys_cache[filepath] = resolvedKeys
+      return resolvedKeys
+    }
+
+    const allKeys = new Set(CurrentFile.loader.keys.map(i => Analyst.normalizeKey(i)))
+    const filteredKeys = resolvedKeys.filter(({ key }) => allKeys.has(Analyst.normalizeKey(key)))
+
     if (filepath)
-      this._get_keys_cache[filepath] = resolvedKeys
-    return resolvedKeys
+      this._get_keys_cache[filepath] = filteredKeys
+    return filteredKeys
   }
 
   /**

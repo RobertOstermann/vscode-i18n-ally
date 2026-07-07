@@ -1,7 +1,7 @@
 {
   "publisher": "RobertOstermann",
   "name": "i18n-ally-ostermann",
-  "version": "2.16.0",
+  "version": "2.17.0",
   "displayName": "i18n Ally Ostermann",
   "description": "🌍 All in one i18n extension for VS Code",
   "keywords": [
@@ -1277,6 +1277,11 @@
         "i18n-ally.defaultNamespace": {
           "type": "string",
           "description": "%config.default_namespace%"
+        },
+        "i18n-ally.ignoreMissingKeys": {
+          "type": "boolean",
+          "default": false,
+          "description": "When enabled, keys not found in locale files will be silently ignored."
         },
         "i18n-ally.derivedKeyRules": {
           "deprecationMessage": "Deprecated. Use \"i18n-ally.usage.derivedKeyRules\" instead."
