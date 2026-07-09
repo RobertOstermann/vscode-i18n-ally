@@ -1,4 +1,4 @@
-import { ExtensionContext } from 'vscode'
+import { ExtensionContext, commands, workspace } from 'vscode'
 import { flatten } from 'lodash'
 import { version } from '../package.json'
 import { Global, Config, KeyDetector, CurrentFile } from '~/core'
@@ -19,6 +19,17 @@ export async function activate(ctx: ExtensionContext) {
   // activate the extension
   await Global.init(ctx)
   CurrentFile.watch(ctx)
+
+  // sync initial context keys
+  commands.executeCommand('setContext', 'i18n-ally.contextMenu.disabled', Config.contextMenuDisabled)
+
+  // watch for config changes
+  ctx.subscriptions.push(
+    workspace.onDidChangeConfiguration((e) => {
+      if (e.affectsConfiguration('i18n-ally.contextMenu.disabled'))
+        commands.executeCommand('setContext', 'i18n-ally.contextMenu.disabled', Config.contextMenuDisabled)
+    }),
+  )
 
   const modules = [
     commandsModules,

@@ -6,9 +6,22 @@
 
 - Extends the original extension with additional controls over which problems are displayed in the editor, giving you finer-grained configuration to suppress or highlight specific i18n diagnostics based on your project's needs.
 - Adds support for the `withPrefix` pattern, which allows you to define a translation key prefix once and reuse it with suffix keys. The extension will automatically resolve the full key for annotations, hover, and diagnostics.
-- Adds the `ignoreMissingKeys` setting, which silently ignores any detected keys that do not exist in your locale files — useful when your regex patterns intentionally match dynamic or partially-constructed keys.
+- Adds the `i18n-ally.ignoreMissingKeys` setting, which silently ignores any detected keys that do not exist in your locale files — useful when your regex patterns intentionally match dynamic or partially-constructed keys.
+- Adds the `i18n-ally.contextMenu.disabled` setting, which prevents i18n Ally from adding any items to the editor context menu.
 
 ## ⚙️ Additional Configuration
+
+### `i18n-ally.contextMenu.disabled`
+
+**Type:** `boolean` | **Default:** `false`
+
+When enabled, i18n Ally will not add any items to the editor context menu.
+
+```json
+{
+  "i18n-ally.contextMenu.disabled": true
+}
+```
 
 ### `i18n-ally.ignoreMissingKeys`
 

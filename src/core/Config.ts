@@ -595,4 +595,13 @@ export class Config {
   static get ignoreMissingKeys(): boolean {
     return this.getConfig<boolean>('ignoreMissingKeys') ?? false
   }
+
+  static get contextMenuDisabled() {
+    return this.getConfig<boolean>('contextMenu.disabled') ?? false
+  }
+
+  static set contextMenuDisabled(v: boolean) {
+    this.setConfig('contextMenu.disabled', v, false)
+    commands.executeCommand('setContext', 'i18n-ally.contextMenu.disabled', v)
+  }
 }

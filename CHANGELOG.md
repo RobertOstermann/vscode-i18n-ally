@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.18.0]
+
+- Adds `contextMenu.disabled` setting to prevent i18n Ally from adding items to the context menu.
+
+## [2.17.0]
+
+- Adds `ignoreMissingKeys` setting to silently ignore detected keys that do not exist in locale files.
+
 ## [2.16.0]
 
 - Adds references support within locale files.

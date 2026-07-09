@@ -1,7 +1,7 @@
 {
   "publisher": "RobertOstermann",
   "name": "i18n-ally-ostermann",
-  "version": "2.17.0",
+  "version": "2.18.0",
   "displayName": "i18n Ally Ostermann",
   "description": "🌍 All in one i18n extension for VS Code",
   "keywords": [
@@ -622,7 +622,8 @@
       "explorer/context": [
         {
           "command": "i18n-ally.extract-hard-strings-batch",
-          "group": "1_i18nally@1"
+          "group": "1_i18nally@1",
+          "when": "i18n-ally.contextMenu.disabled != true"
         }
       ],
       "comments/commentThread/title": [
@@ -712,6 +713,11 @@
       "type": "object",
       "title": "%extname%",
       "properties": {
+        "i18n-ally.contextMenu.disabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Disable i18n Ally will not add any items to the context menu."
+        },
         "i18n-ally.problems.disabled": {
           "type": "boolean",
           "default": false,
